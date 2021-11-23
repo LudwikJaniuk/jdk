@@ -1547,6 +1547,7 @@ void LIR_Address::print_value_on(outputStream* out) const {
 static void print_block(BlockBegin* x) {
   // print block id
   BlockEnd* end = x->end();
+  assert(end != NULL, "We are not in graphbuilder");
   tty->print("B%d ", x->block_id());
 
   // print flags
