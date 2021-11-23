@@ -418,9 +418,9 @@ int BlockListBuilder::mark_loops(BlockBegin* block, bool in_subroutine) {
   _active.set_bit(block_id);
 
   intptr_t loop_state = 0;
-  for (int i = block->number_of_sux() - 1; i >= 0; i--) {
+  for (int i = block->number_of_sux_from_local() - 1; i >= 0; i--) {
     // recursively process all successors
-    loop_state |= mark_loops(block->sux_at(i), in_subroutine);
+    loop_state |= mark_loops(block->sux_at_from_local(i), in_subroutine);
   }
 
   // clear active-bit after all successors are processed
@@ -477,10 +477,10 @@ void BlockListBuilder::print() {
     tty->print(cur->is_set(BlockBegin::subroutine_entry_flag)        ? " sr" : "   ");
     tty->print(cur->is_set(BlockBegin::parser_loop_header_flag)      ? " lh" : "   ");
 
-    if (cur->number_of_sux() > 0) {
+    if (cur->number_of_sux_from_local() > 0) {
       tty->print("    sux: ");
-      for (int j = 0; j < cur->number_of_sux(); j++) {
-        BlockBegin* sux = cur->sux_at(j);
+      for (int j = 0; j < cur->number_of_sux_from_local(); j++) {
+        BlockBegin* sux = cur->sux_at_from_local(j);
         tty->print("B%d ", sux->block_id());
       }
     }
