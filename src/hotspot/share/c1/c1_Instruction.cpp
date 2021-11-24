@@ -534,8 +534,8 @@ void BlockBegin::set_end(BlockEnd* end) {
 
   // remove this block as predecessor of its current successors
   if (_end != NULL) {
-    for (int i1 = 0; i1 < successors()->length(); i1++) { // end is guaranteed
-      successors()->at(i1)->remove_predecessor(this); // end is guaranteed
+    for (int i1 = 0; i1 < number_of_sux(); i1++) { // end is guaranteed
+      sux_at(i1)->remove_predecessor(this); // end is guaranteed
     }
     _end = NULL;
   } else {
@@ -546,10 +546,10 @@ void BlockBegin::set_end(BlockEnd* end) {
 
   // Now reset successors list based on BlockEnd
   // (This is a hint that BlockEnd holds SSOT)
-  successors()->clear();
+  clear_sux();
   for (int i = 0; i < end->number_of_sux(); i++) {
     BlockBegin* sux = end->sux_at(i); // USAGE 5.9 YES BlockBegin
-    successors()->append(sux);
+    add_successor(sux);
     sux->_predecessors.append(this);
   }
 
