@@ -1569,6 +1569,7 @@ static void print_block(BlockBegin* x) {
     }
   }
 
+  if (end != NULL)
   if (x->number_of_sux() > 0) {
     tty->print("sux: ");
     for (int i = 0; i < x->number_of_sux(); i ++) {

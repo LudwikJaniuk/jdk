@@ -954,6 +954,7 @@ void BlockList::print(bool cfg_only, bool live_only) {
 void BlockEnd::set_begin(BlockBegin* begin) {
   BlockList* sux = NULL;
   if (begin != NULL) {
+    assert(begin->end() != NULL, "Using successors, need end");
     sux = begin->successors();
   } else if (this->begin() != NULL) {
     // copy our sux list
