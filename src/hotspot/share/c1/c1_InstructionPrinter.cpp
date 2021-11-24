@@ -612,14 +612,11 @@ void InstructionPrinter::do_BlockBegin(BlockBegin* x) {
     output()->print(" dom B%d", x->dominator()->block_id());
   }
 
-  // AND Why can't this use end()->sux?
-  // RIGHT, it's a printer... it prints everything. And counts the case when end is null.
-  // print predecessors and successors
   assert(x->end() != NULL, "gonna touch successors");
-  if (x->successors()->length() > 0) {
+  if (x->number_of_sux() > 0) {
     output()->print(" sux:");
-    for (int i = 0; i < x->successors()->length(); i ++) {
-      output()->print(" B%d", x->successors()->at(i)->block_id());
+    for (int i = 0; i < x->number_of_sux(); i ++) {
+      output()->print(" B%d", x->sux_at(i)->block_id());
     }
   }
 

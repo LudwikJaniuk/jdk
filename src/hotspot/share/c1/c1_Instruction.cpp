@@ -534,8 +534,8 @@ void BlockBegin::set_end(BlockEnd* end) {
 
   // remove this block as predecessor of its current successors
   if (_end != NULL) {
-    for (int i1 = 0; i1 < _successors.length(); i1++) { // end is guaranteed
-      _successors.at(i1)->remove_predecessor(this); // end is guaranteed
+    for (int i1 = 0; i1 < number_of_sux(); i1++) { // end is guaranteed
+      sux_at(i1)->remove_predecessor(this); // end is guaranteed
     }
     _end = NULL;
   } else {
@@ -547,16 +547,16 @@ void BlockBegin::set_end(BlockEnd* end) {
 
   // Now reset successors list based on BlockEnd
   // (This is a hint that BlockEnd holds SSOT)
-  _successors.clear();
+  clear_sux();
   for (int i = 0; i < end->number_of_sux(); i++) {
     BlockBegin* sux = end->sux_at(i); // USAGE 5.9 YES BlockBegin
-    _successors.append(sux);
+    add_successor(sux);
     sux->_predecessors.append(this);
   }
 
   // Although at this point _end and this have successor lists of the same contents,
   // this makes _end point to the same instance of the list.
-  end->set_sux(&_successors); // But then we call this... which copies them over again...?
+  end->set_sux(successors()); // But then we call this... which copies them over again...?
   _end = end;
 }
 
@@ -576,7 +576,7 @@ void BlockBegin::disconnect_edge(BlockBegin* from, BlockBegin* to) {
       if (index >= 0) {
         sux->_predecessors.remove_at(index);
       }
-      from->_successors.remove_at(s); // _end is asserted
+      from->remove_sux_at(s); // _end is asserted
     } else {
       s++;
     }
