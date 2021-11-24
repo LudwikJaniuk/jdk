@@ -538,6 +538,10 @@ void BlockBegin::set_end(BlockEnd* end) {
       _successors.at(i1)->remove_predecessor(this); // end is guaranteed
     }
     _end = NULL;
+  } else {
+    // What confuses me is, in this case, the successors can still have content, but we are just ignoring it...
+    // Ok. Let's take it at face value. If _end is null, then for some reason, we dont need to deregister predecessors.
+    // We are gonna clear _successors anyways so.
   }
 
 
