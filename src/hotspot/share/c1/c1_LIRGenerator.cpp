@@ -2211,7 +2211,7 @@ SwitchRangeArray* LIRGenerator::create_lookup_ranges(TableSwitch* x) {
   SwitchRangeList* res = new SwitchRangeList();
   int len = x->length();
   if (len > 0) {
-    BlockBegin* sux = x->sux_at(0); // USAGE 5.18
+    BlockBegin* sux = x->sux_at(0); // USAGE 5.18 NO BlockBegin
     int key = x->lo_key();
     BlockBegin* default_sux = x->default_sux();
     C1SwitchRange* range = new C1SwitchRange(key, sux);
@@ -2242,7 +2242,7 @@ SwitchRangeArray* LIRGenerator::create_lookup_ranges(LookupSwitch* x) {
   if (len > 0) {
     BlockBegin* default_sux = x->default_sux();
     int key = x->key_at(0);
-    BlockBegin* sux = x->sux_at(0); // USAGE 5.17
+    BlockBegin* sux = x->sux_at(0); // USAGE 5.17 NO BlockBegin
     C1SwitchRange* range = new C1SwitchRange(key, sux);
     for (int i = 1; i < len; i++) {
       int new_key = x->key_at(i);
@@ -2319,7 +2319,7 @@ void LIRGenerator::do_TableSwitch(TableSwitch* x) {
   } else {
     for (int i = 0; i < len; i++) {
       __ cmp(lir_cond_equal, value, i + lo_key);
-      __ branch(lir_cond_equal, x->sux_at(i)); // USAGE 5.20
+      __ branch(lir_cond_equal, x->sux_at(i)); // USAGE 5.20 NO BlockBegin
     }
     __ jump(x->default_sux());
   }
@@ -2378,7 +2378,7 @@ void LIRGenerator::do_LookupSwitch(LookupSwitch* x) {
     int len = x->length();
     for (int i = 0; i < len; i++) {
       __ cmp(lir_cond_equal, value, x->key_at(i));
-      __ branch(lir_cond_equal, x->sux_at(i)); // USAGE 5.19
+      __ branch(lir_cond_equal, x->sux_at(i)); // USAGE 5.19 NO BlockBegin
     }
     __ jump(x->default_sux());
   }

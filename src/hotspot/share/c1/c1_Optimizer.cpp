@@ -839,7 +839,7 @@ void NullCheckEliminator::iterate_one(BlockBegin* block) {
 
   // Propagate state to successors if necessary
   for (i = 0; i < e->number_of_sux(); i++) {
-    BlockBegin* next = e->sux_at(i); // USAGE 5.22
+    BlockBegin* next = e->sux_at(i); // USAGE 5.22 YES BlockBegin
     if (merge_state_for(next, state())) {
       if (!work_list()->contains(next)) {
         work_list()->push(next);
@@ -1184,7 +1184,7 @@ void Optimizer::eliminate_null_checks() {
     // traverse successors
     BlockEnd *end = b->end();
     for (int s = end->number_of_sux(); s-- > 0; ) {
-      BlockBegin* next = end->sux_at(s); // USAGE 5.21
+      BlockBegin* next = end->sux_at(s); // USAGE 5.21 YES BlockBegin
       int id = next->block_id();
       if (!visited_block.at(id)) {
         blocks.push(next);

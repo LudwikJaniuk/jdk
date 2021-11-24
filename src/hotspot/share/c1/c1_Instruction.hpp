@@ -1595,13 +1595,17 @@ LEAF(BlockBegin, StateSplit)
   ResourceBitMap _stores_to_locals;              // bit is set when a local variable is stored in the block
 
   // SSA specific fields: (factor out later)
-  BlockList   _successors;                       // the successors of this block
+  BlockList   _successors;                       // the successors of this block             // TODO Remove // On each access, is _end set?
   BlockList   _predecessors;                     // the predecessors of this block
   BlockList   _dominates;                        // list of blocks that are dominated by this block
   BlockBegin* _dominator;                        // the dominator of this block
   // SSA specific ends
   BlockEnd*  _end;                               // the last instruction of this block
-  BlockList  _exception_handlers;                // the exception handlers potentially invoked by this block
+  // If we remove _successors, this cant be null... when is it null?
+  // Unless, we would make the accessors treat sux as an empty field...
+  // There is an "add successsor" that explicitly only works when end is null lol
+  // Working theory, it's used in graphbuilder... RESUME HERE
+  BlockList  _exception_handlers;                // the exception handlers potentially invoked by this block    // Are these gues releveant?
   ValueStackStack* _exception_states;            // only for xhandler entries: states of all instructions that have an edge to this xhandler
   int        _exception_handler_pco;             // if this block is the start of an exception handler,
                                                  // this records the PC offset in the assembly code of the
@@ -1653,7 +1657,7 @@ LEAF(BlockBegin, StateSplit)
   , _predecessors(2)
   , _dominates(2)
   , _dominator(NULL)
-  , _end(NULL)
+  , _end(NULL) // Okay... it's null at startup...
   , _exception_handlers(1)
   , _exception_states(NULL)
   , _exception_handler_pco(-1)
@@ -1676,7 +1680,8 @@ LEAF(BlockBegin, StateSplit)
   // accessors
   int block_id() const                           { return _block_id; }
   int bci() const                                { return _bci; }
-  BlockList* successors()                        { return &_successors; }
+  BlockList* successors()                        { return &_successors; } // This enables people to easily break consistency // TODO remove
+  // Luckily, it's literally only used in idiotic syncing code, and in a printer.
   BlockList* dominates()                         { return &_dominates; }
   BlockBegin* dominator() const                  { return _dominator; }
   int loop_depth() const                         { return _loop_depth; }
@@ -1813,6 +1818,7 @@ BASE(BlockEnd, StateSplit)
 
  public:
   // creation
+  // _sux is set every place this is created... (except the Return case for some reason. And Throw, which seems more likely)
   BlockEnd(ValueType* type, ValueStack* state_before, bool is_safepoint)
   : StateSplit(type, state_before)
   , _sux(NULL) // USAGE 3
@@ -1834,7 +1840,7 @@ BASE(BlockEnd, StateSplit)
   BlockBegin* default_sux() const                { return sux_at(number_of_sux() - 1); } // USAGE 6
   BlockBegin** addr_sux_at(int i) const          { return _sux->adr_at(i); } // USAGE 7
   int sux_index(BlockBegin* sux) const           { return _sux->find(sux); } // USAGE 8
-  void substitute_sux(BlockBegin* old_sux, BlockBegin* new_sux); // USAGE 9
+  void substitute_sux(BlockBegin* old_sux, BlockBegin* new_sux); // USAGE 9 (Used 2 times from BlockBegin...)
 };
 
 
@@ -1984,7 +1990,7 @@ LEAF(If, BlockEnd)
   Condition cond() const                         { return _cond; }
   bool unordered_is_true() const                 { return check_flag(UnorderedIsTrueFlag); }
   Value y() const                                { return _y; }
-  BlockBegin* sux_for(bool is_true) const        { return sux_at(is_true ? 0 : 1); } // USAGE 5.24
+  BlockBegin* sux_for(bool is_true) const        { return sux_at(is_true ? 0 : 1); } // USAGE 5.24 NO BlockBegin
   BlockBegin* tsux() const                       { return sux_for(true); }
   BlockBegin* fsux() const                       { return sux_for(false); }
   BlockBegin* usux() const                       { return sux_for(unordered_is_true()); }
@@ -2121,7 +2127,7 @@ LEAF(Base, BlockEnd)
 
   // accessors
   BlockBegin* std_entry() const                  { return default_sux(); }
-  BlockBegin* osr_entry() const                  { return number_of_sux() < 2 ? NULL : sux_at(0); } // USAGE 5.23
+  BlockBegin* osr_entry() const                  { return number_of_sux() < 2 ? NULL : sux_at(0); } // USAGE 5.23 NO BlockBegin
 };
 
 
