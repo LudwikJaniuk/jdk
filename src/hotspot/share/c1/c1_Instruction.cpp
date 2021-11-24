@@ -556,16 +556,16 @@ void BlockBegin::set_end(BlockEnd* end) {
 void BlockBegin::clear_end() {
   // Must make the predecessors/successors match up with the
   // BlockEnd's notion.
-  if (_end != NULL) {
-    // disconnect from the old end
-    _end->clear_begin();
+  if (_end == NULL) return;
 
-    // disconnect this block from it's current successors
-    for (int i = 0; i < _successors.length(); i++) { // end is guaranteed
-      _successors.at(i)->remove_predecessor(this); // end is guaranteed
-    }
-    _end = NULL;
+  // disconnect from the old end
+  _end->clear_begin();
+
+  // disconnect this block from it's current successors
+  for (int i = 0; i < _successors.length(); i++) { // end is guaranteed
+    _successors.at(i)->remove_predecessor(this); // end is guaranteed
   }
+  _end = NULL;
 }
 
 
@@ -972,7 +972,6 @@ void BlockEnd::set_sux_from_begin(BlockBegin* begin) { // TODO refactor reduce
 }
 
 void BlockEnd::clear_begin() {
-    BlockList* sux = NULL;
     if (this->begin() != NULL) {  // Begin can be null. can BlockBegin.end() be null?
       // copy our sux list
       BlockList* sux = new BlockList(this->begin()->number_of_sux());
@@ -980,8 +979,9 @@ void BlockEnd::clear_begin() {
         sux->append(this->begin()->sux_at(i)); // This is gonna be voodoo if I'm not careful
         // Although... this whole method will just be a setter once I'm done
       }
+      // NB the copy is completely worhless
     }
-    _sux = sux;  // USAGE 10
+    _sux = NULL;  // USAGE 10
 }
 
 
