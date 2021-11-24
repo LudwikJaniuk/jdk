@@ -2456,7 +2456,7 @@ inline BlockBegin* BlockBegin::sux_at_from_local(int i) const   { assert(_end ==
 // Usages:
 //  GraphBuilder BlockListBuilder::markloops - used in nullable area of GraphBuilder()
 //  GraphBuilder BlockListBuilder::print - also used in nullable area of GraphBuilder()
-inline void        BlockBegin::add_successor(BlockBegin* sux)   { assert(_end == NULL, "Would create mismatch with successors of BlockEnd");         _successors.append(sux); }
+inline void        BlockBegin::add_successor(BlockBegin* sux)   { assert(_end == NULL, "Would create mismatch with successors of BlockEnd");         successors()->append(sux); }
 // Usages:
 //  GraphBuilder BlockListBuilder::handle_exceptions - used in nullable area of GraphBUilder()
 //  GraphBuilder BlockListBuilder::make_block_at - used in nullable area of GraphBUilder()
