@@ -1735,6 +1735,9 @@ LEAF(BlockBegin, StateSplit)
   int number_of_sux_from_local() const;
   BlockBegin* sux_at(int i) const;
   BlockBegin* sux_at_from_local(int i) const;
+  void remove_sux_at(int i);
+  int find_sux(BlockBegin* sux);
+  void clear_sux();
   void add_successor(BlockBegin* sux);
   bool is_successor(BlockBegin* sux) const       { return _successors.contains(sux); }
 
@@ -1805,7 +1808,7 @@ BASE(BlockEnd, StateSplit)
   BlockList*  _sux; // TARGET
 
  protected:
-  BlockList* sux() const                         { return _sux; } // USAGE 1
+  //BlockList* sux() const                         { return _sux; } // USAGE 1
 
  public:
   void set_sux(BlockList* sux) {
@@ -2454,6 +2457,12 @@ inline BlockBegin* BlockBegin::sux_at_from_local(int i) const   { assert(_end ==
 // Usages:
 //  GraphBuilder BlockListBuilder::markloops - used in nullable area of GraphBuilder()
 //  GraphBuilder BlockListBuilder::print - also used in nullable area of GraphBuilder()
+
+inline void BlockBegin::remove_sux_at(int i) {_successors.remove_at(i);}
+inline int BlockBegin::find_sux(BlockBegin* sux) {return _successors.find(sux);}
+inline void BlockBegin::clear_sux() {_successors.clear();}
+
+
 inline void        BlockBegin::add_successor(BlockBegin* sux)   { assert(_end == NULL, "Would create mismatch with successors of BlockEnd");         _successors.append(sux); }
 // Usages:
 //  GraphBuilder BlockListBuilder::handle_exceptions - used in nullable area of GraphBUilder()
