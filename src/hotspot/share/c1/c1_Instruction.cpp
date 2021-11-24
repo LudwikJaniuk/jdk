@@ -536,17 +536,20 @@ void BlockBegin::set_end(BlockEnd* end) {
   // Set the new end
   _end = end;
 
-  _successors.clear(); // End asserted
-  // Now reset successors list based on BlockEnd  // This is a hint that BlockEnd holds SSOT
-  // Copy successors from end to here
+  // Now reset successors list based on BlockEnd
+  // This is a hint that BlockEnd holds SSOT
+
+  // Copy successors from newEnd to here
+  _successors.clear();
   for (int i = 0; i < end->number_of_sux(); i++) {
     BlockBegin* sux = end->sux_at(i); // USAGE 5.9 YES BlockBegin
-    _successors.append(sux); // End asserted
+    _successors.append(sux);
     sux->_predecessors.append(this);
   }
 
-  // Now copy successors from here to end /facepalm/
-  _end->set_begin(this); // But then we call this... which copies them over again...?
+  // Although at this pont _end and this have successor lists of the same contents,
+  // this makes _end point to the same instance of the list.
+  _end->set_sux_from_begin(this); // But then we call this... which copies them over again...?
 }
 
 
@@ -963,11 +966,9 @@ void BlockList::print(bool cfg_only, bool live_only) {
 // BlockBegin::set_end() actually calls this!
 // And it's the only one. This content code is stupid and should die.
 // 1. split into null/nonnull case
-void BlockEnd::set_begin(BlockBegin* begin) { // TODO refactor reduce
-  BlockList* sux = NULL;
+void BlockEnd::set_sux_from_begin(BlockBegin* begin) { // TODO refactor reduce
   assert(begin->end() != NULL, "Using successors, need end");
-  sux = begin->successors();
-  _sux = sux;  // USAGE 10
+  _sux = begin->successors();  // USAGE 10
 }
 
 void BlockEnd::clear_begin() {
