@@ -544,6 +544,7 @@ void BlockBegin::set_end(BlockEnd* end) {
     // We are gonna clear _successors anyways so.
   }
 
+
   // Now reset successors list based on BlockEnd
   // (This is a hint that BlockEnd holds SSOT)
   clear_sux();
@@ -556,6 +557,7 @@ void BlockBegin::set_end(BlockEnd* end) {
   // Although at this point _end and this have successor lists of the same contents,
   // this makes _end point to the same instance of the list.
   end->set_sux(successors()); // But then we call this... which copies them over again...?
+  // This will become obsolete at some point...
   _end = end;
 }
 
