@@ -151,12 +151,12 @@ BlockListBuilder::BlockListBuilder(Compilation* compilation, IRScope* scope, int
 
 void BlockListBuilder::set_entries(int osr_bci) {
   // generate start blocks
-  BlockBegin* std_entry = make_block_at(0, NULL);
+  BlockBegin* std_entry = make_block_at(0, NULL); // predecessor = NULL
   if (scope()->caller() == NULL) {
     std_entry->set(BlockBegin::std_entry_flag);
   }
   if (osr_bci != -1) {
-    BlockBegin* osr_entry = make_block_at(osr_bci, NULL);
+    BlockBegin* osr_entry = make_block_at(osr_bci, NULL); // predecessor = NULL
     osr_entry->set(BlockBegin::osr_entry_flag);
   }
 
@@ -165,7 +165,7 @@ void BlockListBuilder::set_entries(int osr_bci) {
   const int n = list->length();
   for (int i = 0; i < n; i++) {
     XHandler* h = list->handler_at(i);
-    BlockBegin* entry = make_block_at(h->handler_bci(), NULL);
+    BlockBegin* entry = make_block_at(h->handler_bci(), NULL); // predecessor = NULL
     entry->set(BlockBegin::exception_entry_flag);
     h->set_entry_block(entry);
   }
@@ -259,7 +259,7 @@ void BlockListBuilder::set_leaders() {
     int cur_bci = s.cur_bci();
 
     if (bci_block_start.at(cur_bci)) {
-      current = make_block_at(cur_bci, current);
+      current = make_block_at(cur_bci, current); // predecessor = NULL
     }
     assert(current != NULL, "must have current block");
 
@@ -1250,7 +1250,7 @@ void GraphBuilder::if_node(Value x, If::Condition cond, Value y, ValueStack* sta
   Instruction *i = append(new If(x, cond, false, y, tsux, fsux, (is_bb || compilation()->is_optimistic()) ? state_before : NULL, is_bb));
 
   assert(i->as_Goto() == NULL ||
-         (i->as_Goto()->sux_at(0) == tsux  && i->as_Goto()->is_safepoint() == tsux->bci() < stream()->cur_bci()) ||
+         (i->as_Goto()->sux_at(0) == tsux  && i->as_Goto()->is_safepoint() == tsux->bci() < stream()->cur_bci()) || // USAGE 5.3 (No BlockBegin)
          (i->as_Goto()->sux_at(0) == fsux  && i->as_Goto()->is_safepoint() == fsux->bci() < stream()->cur_bci()),
          "safepoint state of Goto returned by canonicalizer incorrect");
 
@@ -1385,7 +1385,7 @@ void GraphBuilder::table_switch() {
 #ifdef ASSERT
     if (res->as_Goto()) {
       for (i = 0; i < l; i++) {
-        if (sux->at(i) == res->as_Goto()->sux_at(0)) {
+        if (sux->at(i) == res->as_Goto()->sux_at(0)) { // USAGE 5.6 (no BlockBegin)
           assert(res->as_Goto()->is_safepoint() == sw.dest_offset_at(i) < 0, "safepoint state of Goto returned by canonicalizer incorrect");
         }
       }
@@ -1434,7 +1434,7 @@ void GraphBuilder::lookup_switch() {
 #ifdef ASSERT
     if (res->as_Goto()) {
       for (i = 0; i < l; i++) {
-        if (sux->at(i) == res->as_Goto()->sux_at(0)) {
+        if (sux->at(i) == res->as_Goto()->sux_at(0)) { // USAGE 5.5 (no BlockBegin)
           assert(res->as_Goto()->is_safepoint() == sw.pair_at(i).offset() < 0, "safepoint state of Goto returned by canonicalizer incorrect");
         }
       }
@@ -2934,7 +2934,7 @@ BlockEnd* GraphBuilder::iterate_bytecodes_for_block(int bci) {
   block()->set_end(end);
   // propagate state
   for (int i = end->number_of_sux() - 1; i >= 0; i--) {
-    BlockBegin* sux = end->sux_at(i);
+    BlockBegin* sux = end->sux_at(i); // USAGE 5.4 (No BlockBegin, but "block()"...)
     assert(sux->is_predecessor(block()), "predecessor missing");
     // be careful, bailout if bytecodes are strange
     if (!sux->try_merge(end->state())) BAILOUT_("block join failed", NULL);
@@ -3040,7 +3040,7 @@ void GraphBuilder::initialize() {
 BlockBegin* GraphBuilder::header_block(BlockBegin* entry, BlockBegin::Flag f, ValueStack* state) {
   assert(entry->is_set(f), "entry/flag mismatch");
   // create header block
-  BlockBegin* h = new BlockBegin(entry->bci());
+  BlockBegin* h = new BlockBegin(entry->bci()); // USAGE End is set
   h->set_depth_first_number(0);
 
   Value l = h;
@@ -3058,7 +3058,7 @@ BlockBegin* GraphBuilder::header_block(BlockBegin* entry, BlockBegin::Flag f, Va
 
 
 BlockBegin* GraphBuilder::setup_start_block(int osr_bci, BlockBegin* std_entry, BlockBegin* osr_entry, ValueStack* state) {
-  BlockBegin* start = new BlockBegin(0);
+  BlockBegin* start = new BlockBegin(0); // END IS SET
 
   // This code eliminates the empty start block at the beginning of
   // each method.  Previously, each method started with the
@@ -3109,7 +3109,7 @@ void GraphBuilder::setup_osr_entry_block() {
   scope_data()->set_stream(&s);
 
   // create a new block to be the osr setup code
-  _osr_entry = new BlockBegin(osr_bci);
+  _osr_entry = new BlockBegin(osr_bci); // END IS SET
   _osr_entry->set(BlockBegin::osr_entry_flag);
   _osr_entry->set_depth_first_number(0);
   BlockBegin* target = bci2block()->at(osr_bci);
