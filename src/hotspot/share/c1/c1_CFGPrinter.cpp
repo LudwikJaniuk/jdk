@@ -231,6 +231,7 @@ void CFGPrinterOutput::print_LIR(BlockBegin* block) {
 
 void CFGPrinterOutput::print_block(BlockBegin* block) {
   print_begin("block");
+  assert(block->end() != NULL, "CFG is also not in graphbuilder. Only graphbuilder should null end.");
 
   print("name \"B%d\"", block->block_id());
 
