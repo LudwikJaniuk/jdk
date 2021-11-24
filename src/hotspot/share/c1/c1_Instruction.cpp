@@ -575,7 +575,7 @@ void BlockBegin::disconnect_edge(BlockBegin* from, BlockBegin* to) {
       if (index >= 0) {
         sux->_predecessors.remove_at(index);
       }
-      from->successors()->remove_at(s); // _end is asserted
+      from->remove_sux_at(s); // _end is asserted
     } else {
       s++;
     }

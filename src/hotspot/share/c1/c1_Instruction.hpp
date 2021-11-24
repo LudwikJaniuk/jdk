@@ -1735,6 +1735,7 @@ LEAF(BlockBegin, StateSplit)
   int number_of_sux_from_local() const;
   BlockBegin* sux_at(int i) const;
   BlockBegin* sux_at_from_local(int i) const;
+  void remove_sux_at(int i);
   void add_successor(BlockBegin* sux);
   bool is_successor(BlockBegin* sux) const       { return _successors.contains(sux); }
 
@@ -2456,6 +2457,10 @@ inline BlockBegin* BlockBegin::sux_at_from_local(int i) const   { assert(_end ==
 // Usages:
 //  GraphBuilder BlockListBuilder::markloops - used in nullable area of GraphBuilder()
 //  GraphBuilder BlockListBuilder::print - also used in nullable area of GraphBuilder()
+
+inline void BlockBegin::remove_sux_at(int i) {_successors.remove_at(i);}
+
+
 inline void        BlockBegin::add_successor(BlockBegin* sux)   { assert(_end == NULL, "Would create mismatch with successors of BlockEnd");         successors()->append(sux); }
 // Usages:
 //  GraphBuilder BlockListBuilder::handle_exceptions - used in nullable area of GraphBUilder()
