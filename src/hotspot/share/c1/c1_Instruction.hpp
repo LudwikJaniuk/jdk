@@ -1833,7 +1833,7 @@ BASE(BlockEnd, StateSplit)
 
   // manipulation
   void set_sux_from_begin(BlockBegin* begin); // USAGE 10
-  void clear_begin(); // Same as above setting to null
+  // Same as above setting to null
 
   // successors
   int number_of_sux() const                      { return _sux != NULL ? _sux->length() : 0; } // USAGE 4
