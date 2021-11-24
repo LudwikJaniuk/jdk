@@ -1798,24 +1798,24 @@ LEAF(BlockBegin, StateSplit)
 
 BASE(BlockEnd, StateSplit)
  private:
-  BlockList*  _sux;
+  BlockList*  _sux; // TARGET
 
  protected:
-  BlockList* sux() const                         { return _sux; }
+  BlockList* sux() const                         { return _sux; } // USAGE 1
 
   void set_sux(BlockList* sux) {
 #ifdef ASSERT
     assert(sux != NULL, "sux must exist");
     for (int i = sux->length() - 1; i >= 0; i--) assert(sux->at(i) != NULL, "sux must exist");
 #endif
-    _sux = sux;
+    _sux = sux; // USAGE 2
   }
 
  public:
   // creation
   BlockEnd(ValueType* type, ValueStack* state_before, bool is_safepoint)
   : StateSplit(type, state_before)
-  , _sux(NULL)
+  , _sux(NULL) // USAGE 3
   {
     set_flag(IsSafepointFlag, is_safepoint);
   }
@@ -1826,15 +1826,15 @@ BASE(BlockEnd, StateSplit)
   BlockBegin* begin() const                      { return _block; }
 
   // manipulation
-  void set_begin(BlockBegin* begin);
+  void set_begin(BlockBegin* begin); // USAGE 10
 
   // successors
-  int number_of_sux() const                      { return _sux != NULL ? _sux->length() : 0; }
-  BlockBegin* sux_at(int i) const                { return _sux->at(i); }
-  BlockBegin* default_sux() const                { return sux_at(number_of_sux() - 1); }
-  BlockBegin** addr_sux_at(int i) const          { return _sux->adr_at(i); }
-  int sux_index(BlockBegin* sux) const           { return _sux->find(sux); }
-  void substitute_sux(BlockBegin* old_sux, BlockBegin* new_sux);
+  int number_of_sux() const                      { return _sux != NULL ? _sux->length() : 0; } // USAGE 4
+  BlockBegin* sux_at(int i) const                { return _sux->at(i); } // USAGE 5
+  BlockBegin* default_sux() const                { return sux_at(number_of_sux() - 1); } // USAGE 6
+  BlockBegin** addr_sux_at(int i) const          { return _sux->adr_at(i); } // USAGE 7
+  int sux_index(BlockBegin* sux) const           { return _sux->find(sux); } // USAGE 8
+  void substitute_sux(BlockBegin* old_sux, BlockBegin* new_sux); // USAGE 9
 };
 
 
@@ -1984,7 +1984,7 @@ LEAF(If, BlockEnd)
   Condition cond() const                         { return _cond; }
   bool unordered_is_true() const                 { return check_flag(UnorderedIsTrueFlag); }
   Value y() const                                { return _y; }
-  BlockBegin* sux_for(bool is_true) const        { return sux_at(is_true ? 0 : 1); }
+  BlockBegin* sux_for(bool is_true) const        { return sux_at(is_true ? 0 : 1); } // USAGE 5.24
   BlockBegin* tsux() const                       { return sux_for(true); }
   BlockBegin* fsux() const                       { return sux_for(false); }
   BlockBegin* usux() const                       { return sux_for(unordered_is_true()); }
@@ -2121,7 +2121,7 @@ LEAF(Base, BlockEnd)
 
   // accessors
   BlockBegin* std_entry() const                  { return default_sux(); }
-  BlockBegin* osr_entry() const                  { return number_of_sux() < 2 ? NULL : sux_at(0); }
+  BlockBegin* osr_entry() const                  { return number_of_sux() < 2 ? NULL : sux_at(0); } // USAGE 5.23
 };
 
 
@@ -2442,9 +2442,19 @@ typedef GrowableArray<BlockPair*> BlockPairList;
 
 inline int         BlockBegin::number_of_sux() const            { assert(_end != NULL && _end->number_of_sux() == _successors.length(), "mismatch"); return _successors.length(); }
 inline int         BlockBegin::number_of_sux_from_local() const { assert(_end == NULL, "should only be used when _end is null");                     return _successors.length(); }
+// Usages:
+//  GraphBuilder BlockListBuilder::markloops - used in nullable area of GraphBuilder()
+//  GraphBuilder BlockListBuilder::print - also used in nullable area of GraphBuilder()
 inline BlockBegin* BlockBegin::sux_at(int i) const              { assert(_end != NULL && _end->sux_at(i) == _successors.at(i), "mismatch");          return _successors.at(i); }
 inline BlockBegin* BlockBegin::sux_at_from_local(int i) const   { assert(_end == NULL, "should only be used when _end is null");                     return _successors.at(i); }
+// Usages:
+//  GraphBuilder BlockListBuilder::markloops - used in nullable area of GraphBuilder()
+//  GraphBuilder BlockListBuilder::print - also used in nullable area of GraphBuilder()
 inline void        BlockBegin::add_successor(BlockBegin* sux)   { assert(_end == NULL, "Would create mismatch with successors of BlockEnd");         _successors.append(sux); }
+// Usages:
+//  GraphBuilder BlockListBuilder::handle_exceptions - used in nullable area of GraphBUilder()
+//  GraphBuilder BlockListBuilder::make_block_at - used in nullable area of GraphBUilder()
+
 
 #undef ASSERT_VALUES
 

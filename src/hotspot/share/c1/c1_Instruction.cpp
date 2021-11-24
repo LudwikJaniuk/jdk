@@ -537,7 +537,7 @@ void BlockBegin::set_end(BlockEnd* end) {
   _successors.clear();
   // Now reset successors list based on BlockEnd
   for (int i = 0; i < end->number_of_sux(); i++) {
-    BlockBegin* sux = end->sux_at(i);
+    BlockBegin* sux = end->sux_at(i); // USAGE 5.9
     _successors.append(sux);
     sux->_predecessors.append(this);
   }
@@ -710,7 +710,7 @@ void BlockBegin::iterate_preorder(boolArray& mark, BlockClosure* closure) {
     closure->block_do(this);
     BlockEnd* e = end(); // must do this after block_do because block_do may change it!
     { for (int i = number_of_exception_handlers() - 1; i >= 0; i--) exception_handler_at(i)->iterate_preorder(mark, closure); }
-    { for (int i = e->number_of_sux            () - 1; i >= 0; i--) e->sux_at           (i)->iterate_preorder(mark, closure); }
+    { for (int i = e->number_of_sux            () - 1; i >= 0; i--) e->sux_at           (i)->iterate_preorder(mark, closure); } // USAGE 5.8
   }
 }
 
@@ -720,7 +720,7 @@ void BlockBegin::iterate_postorder(boolArray& mark, BlockClosure* closure) {
     mark.at_put(block_id(), true);
     BlockEnd* e = end();
     { for (int i = number_of_exception_handlers() - 1; i >= 0; i--) exception_handler_at(i)->iterate_postorder(mark, closure); }
-    { for (int i = e->number_of_sux            () - 1; i >= 0; i--) e->sux_at           (i)->iterate_postorder(mark, closure); }
+    { for (int i = e->number_of_sux            () - 1; i >= 0; i--) e->sux_at           (i)->iterate_postorder(mark, closure); } // USAGE 5.7
     closure->block_do(this);
   }
 }
@@ -962,12 +962,12 @@ void BlockEnd::set_begin(BlockBegin* begin) {
       sux->append(this->begin()->sux_at(i));
     }
   }
-  _sux = sux;
+  _sux = sux;  // USAGE 10
 }
 
 
 void BlockEnd::substitute_sux(BlockBegin* old_sux, BlockBegin* new_sux) {
-  substitute(*_sux, old_sux, new_sux);
+  substitute(*_sux, old_sux, new_sux); // USAGE 9
 }
 
 

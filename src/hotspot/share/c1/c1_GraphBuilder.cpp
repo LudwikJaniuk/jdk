@@ -1250,7 +1250,7 @@ void GraphBuilder::if_node(Value x, If::Condition cond, Value y, ValueStack* sta
   Instruction *i = append(new If(x, cond, false, y, tsux, fsux, (is_bb || compilation()->is_optimistic()) ? state_before : NULL, is_bb));
 
   assert(i->as_Goto() == NULL ||
-         (i->as_Goto()->sux_at(0) == tsux  && i->as_Goto()->is_safepoint() == tsux->bci() < stream()->cur_bci()) ||
+         (i->as_Goto()->sux_at(0) == tsux  && i->as_Goto()->is_safepoint() == tsux->bci() < stream()->cur_bci()) || // USAGE 5.3 (No BlockBegin)
          (i->as_Goto()->sux_at(0) == fsux  && i->as_Goto()->is_safepoint() == fsux->bci() < stream()->cur_bci()),
          "safepoint state of Goto returned by canonicalizer incorrect");
 
@@ -1385,7 +1385,7 @@ void GraphBuilder::table_switch() {
 #ifdef ASSERT
     if (res->as_Goto()) {
       for (i = 0; i < l; i++) {
-        if (sux->at(i) == res->as_Goto()->sux_at(0)) {
+        if (sux->at(i) == res->as_Goto()->sux_at(0)) { // USAGE 5.6
           assert(res->as_Goto()->is_safepoint() == sw.dest_offset_at(i) < 0, "safepoint state of Goto returned by canonicalizer incorrect");
         }
       }
@@ -1434,7 +1434,7 @@ void GraphBuilder::lookup_switch() {
 #ifdef ASSERT
     if (res->as_Goto()) {
       for (i = 0; i < l; i++) {
-        if (sux->at(i) == res->as_Goto()->sux_at(0)) {
+        if (sux->at(i) == res->as_Goto()->sux_at(0)) { // USAGE 5.5
           assert(res->as_Goto()->is_safepoint() == sw.pair_at(i).offset() < 0, "safepoint state of Goto returned by canonicalizer incorrect");
         }
       }
@@ -2934,7 +2934,7 @@ BlockEnd* GraphBuilder::iterate_bytecodes_for_block(int bci) {
   block()->set_end(end);
   // propagate state
   for (int i = end->number_of_sux() - 1; i >= 0; i--) {
-    BlockBegin* sux = end->sux_at(i);
+    BlockBegin* sux = end->sux_at(i); // USAGE 5.4
     assert(sux->is_predecessor(block()), "predecessor missing");
     // be careful, bailout if bytecodes are strange
     if (!sux->try_merge(end->state())) BAILOUT_("block join failed", NULL);

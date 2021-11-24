@@ -324,7 +324,7 @@ class CriticalEdgeFinder: public BlockClosure {
     int nos = be->number_of_sux();
     if (nos >= 2) {
       for (int i = 0; i < nos; i++) {
-        BlockBegin* sux = be->sux_at(i);
+        BlockBegin* sux = be->sux_at(i); // USAGE 5.16
         if (sux->number_of_preds() >= 2) {
           blocks.append(new BlockPair(bb, sux));
         }
@@ -1320,7 +1320,7 @@ class PredecessorValidator : public BlockClosure {
     int n = be->number_of_sux();
     int i;
     for (i = 0; i < n; i++) {
-      BlockBegin* sux = be->sux_at(i);
+      BlockBegin* sux = be->sux_at(i); // USAGE 5.15
       assert(!sux->is_set(BlockBegin::exception_entry_flag), "must not be xhandler");
 
       BlockList* preds = _predecessors->at_grow(sux->block_id(), NULL);
