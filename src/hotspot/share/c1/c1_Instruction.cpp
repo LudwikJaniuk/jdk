@@ -536,17 +536,20 @@ void BlockBegin::set_end(BlockEnd* end) {
   // Set the new end
   _end = end;
 
-  _successors.clear(); // End asserted
-  // Now reset successors list based on BlockEnd  // This is a hint that BlockEnd holds SSOT
-  // Copy successors from end to here
+  // Now reset successors list based on BlockEnd
+  // This is a hint that BlockEnd holds SSOT
+
+  // Copy successors from newEnd to here
+  _successors.clear();
   for (int i = 0; i < end->number_of_sux(); i++) {
     BlockBegin* sux = end->sux_at(i); // USAGE 5.9 YES BlockBegin
-    _successors.append(sux); // End asserted
+    _successors.append(sux);
     sux->_predecessors.append(this);
   }
 
-  // Now copy successors from here to end /facepalm/
-  _end->set_begin(this); // But then we call this... which copies them over again...?
+  // Although at this pont _end and this have successor lists of the same contents,
+  // this makes _end point to the same instance of the list.
+  _end->set_sux_from_begin(this); // But then we call this... which copies them over again...?
 }
 
 
@@ -555,7 +558,7 @@ void BlockBegin::clear_end() {
   // BlockEnd's notion.
   if (_end != NULL) {
     // disconnect from the old end
-    _end->set_begin(NULL);
+    _end->clear_begin();
 
     // disconnect this block from it's current successors
     for (int i = 0; i < _successors.length(); i++) { // end is guaranteed
@@ -962,20 +965,23 @@ void BlockList::print(bool cfg_only, bool live_only) {
 // The duality between this and BlockBegin::set_end() is interesting. Both defer to the other.
 // BlockBegin::set_end() actually calls this!
 // And it's the only one. This content code is stupid and should die.
-void BlockEnd::set_begin(BlockBegin* begin) { // TODO refactor reduce
-  BlockList* sux = NULL;
-  if (begin != NULL) {
-    assert(begin->end() != NULL, "Using successors, need end");
-    sux = begin->successors();
-  } else if (this->begin() != NULL) {  // Begin can be null. can BlockBegin.end() be null?
-    // copy our sux list
-    BlockList* sux = new BlockList(this->begin()->number_of_sux());
-    for (int i = 0; i < this->begin()->number_of_sux(); i++) {
-      sux->append(this->begin()->sux_at(i)); // This is gonna be voodoo if I'm not careful
-                                                  // Although... this whole method will just be a setter once I'm done
+// 1. split into null/nonnull case
+void BlockEnd::set_sux_from_begin(BlockBegin* begin) { // TODO refactor reduce
+  assert(begin->end() != NULL, "Using successors, need end");
+  _sux = begin->successors();  // USAGE 10
+}
+
+void BlockEnd::clear_begin() {
+    BlockList* sux = NULL;
+    if (this->begin() != NULL) {  // Begin can be null. can BlockBegin.end() be null?
+      // copy our sux list
+      BlockList* sux = new BlockList(this->begin()->number_of_sux());
+      for (int i = 0; i < this->begin()->number_of_sux(); i++) {
+        sux->append(this->begin()->sux_at(i)); // This is gonna be voodoo if I'm not careful
+        // Although... this whole method will just be a setter once I'm done
+      }
     }
-  }
-  _sux = sux;  // USAGE 10
+    _sux = sux;  // USAGE 10
 }
 
 
