@@ -582,25 +582,6 @@ void BlockBegin::disconnect_edge(BlockBegin* from, BlockBegin* to) {
   }
 }
 
-// Seems to not need to change prev _end._sux, because that _end is being discarded anyways,
-// in the only place this is called
-// TODO refactor into blockmerger where it's used
-void BlockBegin::disconnect_from_graph() {
-  // disconnect this block from all other blocks
-  for (int p = 0; p < number_of_preds(); p++) {
-    BlockBegin *receiver = pred_at(p);
-    assert(receiver->end() != NULL, "NA?");
-    int idx;
-    while ((idx = receiver->_successors.find(this)) >= 0) { // end guaranteed
-      receiver->_successors.remove_at(idx); // end guaranteed
-      // Hmm... I think end might be guaranteed, its after the phase with graphbuilder
-    }
-  }
-  for (int s = 0; s < number_of_sux(); s++) {
-    sux_at(s)->remove_predecessor(this);
-  }
-}
-
 void BlockBegin::substitute_sux(BlockBegin* old_sux, BlockBegin* new_sux) {
   // modify predecessors before substituting successors
   for (int i = 0; i < number_of_sux(); i++) {
