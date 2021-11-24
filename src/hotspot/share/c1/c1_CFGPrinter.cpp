@@ -231,6 +231,7 @@ void CFGPrinterOutput::print_LIR(BlockBegin* block) {
 
 void CFGPrinterOutput::print_block(BlockBegin* block) {
   print_begin("block");
+  assert(block->end() != NULL, "Necessary to print successors.");
 
   print("name \"B%d\"", block->block_id());
 
