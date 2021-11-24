@@ -379,7 +379,19 @@ class BlockMerger: public BlockClosure {
         assert(prev->as_BlockEnd() == NULL, "must not be a BlockEnd");
         prev->set_next(next);
         prev->fixup_block_pointers();
-        sux->disconnect_from_graph();
+        BlockBegin *receiver = sux;// disconnect this block from all other blocks
+        for (int p = 0; p < receiver->number_of_preds(); p++) {
+          BlockBegin *receiver1 = receiver->pred_at(p);
+          assert(receiver1->end() != NULL, "NA?");
+          int idx;
+          while ((idx = receiver1->successors()->find(receiver)) >= 0) { // end guaranteed
+            receiver1->successors()->remove_at(idx); // end guaranteed
+            // Hmm... I think end might be guaranteed, its after the phase with graphbuilder
+          }
+        }
+        for (int s = 0; s < receiver->number_of_sux(); s++) {
+          receiver->sux_at(s)->remove_predecessor(receiver);
+        }
         block->set_end(sux->end());
         // add exception handlers of deleted block, if any
         for (int k = 0; k < sux->number_of_exception_handlers(); k++) {
