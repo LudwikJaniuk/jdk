@@ -227,7 +227,7 @@ void BlockListBuilder::handle_exceptions(BlockBegin* current, int cur_bci) {
       assert(entry->is_set(BlockBegin::exception_entry_flag), "flag must be set");
 
       // add each exception handler only once
-      if (!current->is_successor(entry)) {
+      if(!_bci2block_successors.at(current->bci()).contains(entry)) {
         local_block_add_successor(current, entry);
         entry->increment_total_preds();
       }

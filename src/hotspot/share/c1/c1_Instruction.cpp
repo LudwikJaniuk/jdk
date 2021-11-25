@@ -538,27 +538,14 @@ void BlockBegin::set_end(BlockEnd* end) {
       sux_at(i1)->remove_predecessor(this); // end is guaranteed
     }
     _end = NULL;
-  } else {
-    // What confuses me is, in this case, the successors can still have content, but we are just ignoring it...
-    // Ok. Let's take it at face value. If _end is null, then for some reason, we dont need to deregister predecessors.
-    // We are gonna clear _successors anyways so.
   }
 
+  _end = end;
 
-  // Now reset successors list based on BlockEnd
-  // (This is a hint that BlockEnd holds SSOT)
-  clear_sux(); // Cannot remove yet
-  for (int i = 0; i < end->number_of_sux(); i++) {
-    BlockBegin* sux = end->sux_at(i); // USAGE 5.9 YES BlockBegin
-    add_successor_local(sux);
+  for (int i = 0; i < number_of_sux(); i++) {
+    BlockBegin* sux = sux_at(i); // USAGE 5.9 YES BlockBegin
     sux->_predecessors.append(this);
   }
-
-  // Although at this point _end and this have successor lists of the same contents,
-  // this makes _end point to the same instance of the list.
-  end->set_sux(successors()); // But then we call this... which copies them over again...?
-  // This will become obsolete at some point...
-  _end = end;
 }
 
 
@@ -577,13 +564,18 @@ void BlockBegin::disconnect_edge(BlockBegin* from, BlockBegin* to) {
       if (index >= 0) {
         sux->_predecessors.remove_at(index);
       }
-      assert(from->successors() == from->end()->sux(), "must match janiuk");
+      //assert(from->successors() == from->end()->sux(), "must match janiuk");
       from->end()->remove_sux_at(s); // _end is asserted
     } else {
       s++;
     }
   }
 }
+
+BlockList* BlockBegin::successors() {
+  assert(_end != NULL, "need end");
+  return _end->sux();
+} // This enables people to easily break consistency // TODO remove
 
 void BlockBegin::substitute_sux(BlockBegin* old_sux, BlockBegin* new_sux) {
   // modify predecessors before substituting successors
