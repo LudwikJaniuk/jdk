@@ -1808,7 +1808,7 @@ BASE(BlockEnd, StateSplit)
   BlockList*  _sux; // TARGET
 
  protected:
-  BlockList* sux() const                         { return _sux; } // USAGE 1
+  //BlockList* sux() const                         { return _sux; } // USAGE 1
 
  public:
   void set_sux(BlockList* sux) {
