@@ -569,11 +569,6 @@ void BlockBegin::disconnect_edge(BlockBegin* from, BlockBegin* to) {
   }
 }
 
-BlockList* BlockBegin::successors() {
-  assert(_end != NULL, "need end");
-  return _end->sux();
-} // This enables people to easily break consistency // TODO remove
-
 void BlockBegin::substitute_sux(BlockBegin* old_sux, BlockBegin* new_sux) {
   // modify predecessors before substituting successors
   for (int i = 0; i < number_of_sux(); i++) {

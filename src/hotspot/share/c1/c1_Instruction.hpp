@@ -1674,8 +1674,6 @@ LEAF(BlockBegin, StateSplit)
   // accessors
   int block_id() const                           { return _block_id; }
   int bci() const                                { return _bci; }
-  BlockList* successors();
-  // Luckily, it's literally only used in idiotic syncing code, and in a printer.
   BlockList* dominates()                         { return &_dominates; }
   BlockBegin* dominator() const                  { return _dominator; }
   int loop_depth() const                         { return _loop_depth; }
