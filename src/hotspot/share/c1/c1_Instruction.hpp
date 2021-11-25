@@ -1802,9 +1802,7 @@ BASE(BlockEnd, StateSplit)
   }
 
  public:
-
   // creation
-  // _sux is set every place this is created... (except the Return case for some reason. And Throw, which seems more likely)
   BlockEnd(ValueType* type, ValueStack* state_before, bool is_safepoint)
   : StateSplit(type, state_before)
   , _sux(NULL)
@@ -1820,14 +1818,11 @@ BASE(BlockEnd, StateSplit)
   // manipulation
   void remove_sux_at(int i) { _sux->remove_at(i);}
   int find_sux(BlockBegin* sux) {return _sux->find(sux);}
-  void clear_sux() {_sux->clear();}
 
   // successors
   int number_of_sux() const                      { return _sux != NULL ? _sux->length() : 0; }
   BlockBegin* sux_at(int i) const                { return _sux->at(i); }
   BlockBegin* default_sux() const                { return sux_at(number_of_sux() - 1); }
-  BlockBegin** addr_sux_at(int i) const          { return _sux->adr_at(i); } // TODO REMOVE?
-  int sux_index(BlockBegin* sux) const           { return _sux->find(sux); } // TODO REMOVE?
   void substitute_sux(BlockBegin* old_sux, BlockBegin* new_sux);
 };
 
