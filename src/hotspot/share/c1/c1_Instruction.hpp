@@ -1600,7 +1600,7 @@ LEAF(BlockBegin, StateSplit)
   BlockBegin* _dominator;                        // the dominator of this block
   // SSA specific ends
   BlockEnd*  _end;                               // the last instruction of this block
-  BlockList  _exception_handlers;                // the exception handlers potentially invoked by this block    // Are these gues releveant?
+  BlockList  _exception_handlers;                // the exception handlers potentially invoked by this block
   ValueStackStack* _exception_states;            // only for xhandler entries: states of all instructions that have an edge to this xhandler
   int        _exception_handler_pco;             // if this block is the start of an exception handler,
                                                  // this records the PC offset in the assembly code of the
@@ -1783,7 +1783,6 @@ LEAF(BlockBegin, StateSplit)
   // debugging
   void print_block()                             PRODUCT_RETURN;
   void print_block(InstructionPrinter& ip, bool live_only = false) PRODUCT_RETURN;
-
 };
 
 
