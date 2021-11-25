@@ -109,16 +109,12 @@ class BlockListBuilder {
 int BlockListBuilder::local_block_number_of_successors(BlockBegin* block)
 {
   assert(_bci2block_successors.length() > block->bci(), "sux must exist");
-  assert(block->number_of_sux_from_local() == _bci2block_successors.at(block->bci()).length(), "same answer?");
-  //return block->number_of_sux_from_local();
   return _bci2block_successors.at(block->bci()).length();
 }
 
 BlockBegin* BlockListBuilder::local_block_successor_at(BlockBegin* block, int i)
 {
   assert(_bci2block_successors.length() > block->bci(), "sux must exist");
-  assert(block->sux_at_from_local(i) == _bci2block_successors.at(block->bci()).at(i), "same answer?");
-  //return block->sux_at_from_local(i);
   return _bci2block_successors.at(block->bci()).at(i);
 }
 
@@ -126,7 +122,6 @@ void BlockListBuilder::local_block_add_successor(BlockBegin* block, BlockBegin* 
 {
   assert(_bci2block_successors.length() > block->bci(), "sux must exist");
   _bci2block_successors.at(block->bci()).append(sux);
-  block->add_successor_local(sux);
 }
 
 BlockListBuilder::BlockListBuilder(Compilation* compilation, IRScope* scope, int osr_bci)
