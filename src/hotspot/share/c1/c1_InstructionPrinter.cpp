@@ -612,6 +612,7 @@ void InstructionPrinter::do_BlockBegin(BlockBegin* x) {
     output()->print(" dom B%d", x->dominator()->block_id());
   }
 
+  // TODO the rest of this method should follow this assertion
   assert(x->end() != NULL, "gonna touch successors");
   if (x->number_of_sux() > 0) {
     output()->print(" sux:");

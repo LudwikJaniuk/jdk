@@ -383,9 +383,8 @@ class BlockMerger: public BlockClosure {
         for (int p = 0; p < receiver->number_of_preds(); p++) {
           BlockBegin *receiver1 = receiver->pred_at(p);
           int idx;
-          while ((idx = receiver1->end()->find_sux(receiver)) >= 0) { // end guaranteed
-            receiver1->end()->remove_sux_at(idx); // end guaranteed
-            // Hmm... I think end might be guaranteed, its after the phase with graphbuilder
+          while ((idx = receiver1->end()->find_sux(receiver)) >= 0) {
+            receiver1->end()->remove_sux_at(idx);
           }
         }
         for (int s = 0; s < receiver->number_of_sux(); s++) {
