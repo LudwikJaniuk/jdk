@@ -1790,7 +1790,7 @@ BASE(BlockEnd, StateSplit)
  private:
   BlockList*  _sux;
 
- public:
+ protected:
   BlockList* sux() const                         { return _sux; }
 
   void set_sux(BlockList* sux) {
@@ -1800,6 +1800,8 @@ BASE(BlockEnd, StateSplit)
 #endif
     _sux = sux;
   }
+
+ public:
 
   // creation
   // _sux is set every place this is created... (except the Return case for some reason. And Throw, which seems more likely)
