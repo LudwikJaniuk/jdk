@@ -2447,11 +2447,11 @@ class BlockPair: public CompilationResourceObj {
 
 typedef GrowableArray<BlockPair*> BlockPairList;
 
-inline int         BlockBegin::number_of_sux() const            { assert(_end != NULL && _end->number_of_sux() == _successors.length(), "mismatch"); return _successors.length(); }
+inline int         BlockBegin::number_of_sux() const            { assert(_end != NULL && _end->number_of_sux() == _successors.length(), "mismatch"); return _end->number_of_sux(); }
 // Usages:
 //  GraphBuilder BlockListBuilder::markloops - used in nullable area of GraphBuilder()
 //  GraphBuilder BlockListBuilder::print - also used in nullable area of GraphBuilder()
-inline BlockBegin* BlockBegin::sux_at(int i) const              { assert(_end != NULL && _end->sux_at(i) == _successors.at(i), "mismatch");          return _successors.at(i); }
+inline BlockBegin* BlockBegin::sux_at(int i) const              { assert(_end != NULL && _end->sux_at(i) == _successors.at(i), "mismatch");          return _end->sux_at(i); }
 // Usages:
 //  GraphBuilder BlockListBuilder::markloops - used in nullable area of GraphBuilder()
 //  GraphBuilder BlockListBuilder::print - also used in nullable area of GraphBuilder()
