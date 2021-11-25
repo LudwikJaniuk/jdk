@@ -547,7 +547,7 @@ void BlockBegin::set_end(BlockEnd* end) {
 
   // Now reset successors list based on BlockEnd
   // (This is a hint that BlockEnd holds SSOT)
-  clear_sux();
+  clear_sux(); // Cannot remove yet
   for (int i = 0; i < end->number_of_sux(); i++) {
     BlockBegin* sux = end->sux_at(i); // USAGE 5.9 YES BlockBegin
     add_successor_local(sux);
@@ -576,7 +576,8 @@ void BlockBegin::disconnect_edge(BlockBegin* from, BlockBegin* to) {
       if (index >= 0) {
         sux->_predecessors.remove_at(index);
       }
-      from->remove_sux_at(s); // _end is asserted
+      assert(from->successors() == from->end()->sux(), "must match janiuk");
+      from->end()->remove_sux_at(s); // _end is asserted
     } else {
       s++;
     }
