@@ -1595,7 +1595,6 @@ LEAF(BlockBegin, StateSplit)
   ResourceBitMap _stores_to_locals;              // bit is set when a local variable is stored in the block
 
   // SSA specific fields: (factor out later)
-  BlockList   _successors;                       // the successors of this block             // TODO Remove // On each access, is _end set?
   BlockList   _predecessors;                     // the predecessors of this block
   BlockList   _dominates;                        // list of blocks that are dominated by this block
   BlockBegin* _dominator;                        // the dominator of this block
@@ -1653,7 +1652,6 @@ LEAF(BlockBegin, StateSplit)
   , _flags(0)
   , _total_preds(0)
   , _stores_to_locals()
-  , _successors(2)
   , _predecessors(2)
   , _dominates(2)
   , _dominator(NULL)
