@@ -550,7 +550,7 @@ void BlockBegin::set_end(BlockEnd* end) {
   clear_sux();
   for (int i = 0; i < end->number_of_sux(); i++) {
     BlockBegin* sux = end->sux_at(i); // USAGE 5.9 YES BlockBegin
-    add_successor(sux);
+    add_successor_local(sux);
     sux->_predecessors.append(this);
   }
 
