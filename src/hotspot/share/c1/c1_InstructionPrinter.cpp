@@ -594,7 +594,7 @@ void InstructionPrinter::do_BlockBegin(BlockBegin* x) {
   if (end != NULL && end->number_of_sux() > 0) {
     output()->print(" ->");
     for (int i = 0; i < end->number_of_sux(); i++) {
-      output()->print(" B%d", end->sux_at(i)->block_id()); // USAGE 5.11 YES BlockBegin
+      output()->print(" B%d", end->sux_at(i)->block_id());
     }
   }
   // print exception handlers
@@ -719,7 +719,7 @@ void InstructionPrinter::do_If(If* x) {
   print_value(x->x());
   output()->print(" %s ", cond_name(x->cond()));
   print_value(x->y());
-  output()->print(" then B%d else B%d", x->sux_at(0)->block_id(), x->sux_at(1)->block_id()); // USAGE 5.12 (No BlockBegin)
+  output()->print(" then B%d else B%d", x->sux_at(0)->block_id(), x->sux_at(1)->block_id());
   if (x->is_safepoint()) output()->print(" (safepoint)");
 }
 
@@ -732,7 +732,7 @@ void InstructionPrinter::do_TableSwitch(TableSwitch* x) {
   int l = x->length();
   for (int i = 0; i < l; i++) {
     fill_to(instr_pos);
-    output()->print_cr("case %5d: B%d", x->lo_key() + i, x->sux_at(i)->block_id()); // USAGE 5.14 No BlockBegin
+    output()->print_cr("case %5d: B%d", x->lo_key() + i, x->sux_at(i)->block_id());
   }
   fill_to(instr_pos);
   output()->print("default   : B%d", x->default_sux()->block_id());
@@ -747,7 +747,7 @@ void InstructionPrinter::do_LookupSwitch(LookupSwitch* x) {
   int l = x->length();
   for (int i = 0; i < l; i++) {
     fill_to(instr_pos);
-    output()->print_cr("case %5d: B%d", x->key_at(i), x->sux_at(i)->block_id()); // USAGE 5.13 (No BlockBegin)
+    output()->print_cr("case %5d: B%d", x->key_at(i), x->sux_at(i)->block_id());
   }
   fill_to(instr_pos);
   output()->print("default   : B%d", x->default_sux()->block_id());
