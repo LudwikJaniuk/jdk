@@ -524,7 +524,6 @@ Constant::CompareResult Constant::compare(Instruction::Condition cond, Value rig
 
 // Implementation of BlockBegin
 
-
 // This... is used a lot... probably its code is more relied upon
 void BlockBegin::set_end(BlockEnd* end) {
   assert(end != NULL, "should not reset block end to NULL");
@@ -543,7 +542,7 @@ void BlockBegin::set_end(BlockEnd* end) {
   _end = end;
 
   for (int i = 0; i < number_of_sux(); i++) {
-    BlockBegin* sux = sux_at(i); // USAGE 5.9 YES BlockBegin
+    BlockBegin* sux = sux_at(i);
     sux->_predecessors.append(this);
   }
 }
@@ -556,16 +555,14 @@ void BlockBegin::disconnect_edge(BlockBegin* from, BlockBegin* to) {
     tty->print_cr("Disconnected edge B%d -> B%d", from->block_id(), to->block_id());
   }
 #endif
-  // I think end should be asserted here
-  for (int s = 0; s < from->number_of_sux();) { // asserts _end
+  for (int s = 0; s < from->number_of_sux();) {
     BlockBegin* sux = from->sux_at(s);
     if (sux == to) {
       int index = sux->_predecessors.find(from);
       if (index >= 0) {
         sux->_predecessors.remove_at(index);
       }
-      //assert(from->successors() == from->end()->sux(), "must match janiuk");
-      from->end()->remove_sux_at(s); // _end is asserted
+      from->end()->remove_sux_at(s);
     } else {
       s++;
     }
@@ -598,7 +595,7 @@ BlockBegin* BlockBegin::insert_block_between(BlockBegin* sux) {
   // goto. The bci of the goto can't be the one of the if otherwise
   // the state and bci are inconsistent and a deoptimization triggered
   // by the predicate would lead to incorrect execution/a crash.
-  BlockBegin* new_sux = new BlockBegin(bci); // END IS SET
+  BlockBegin* new_sux = new BlockBegin(bci);
 
   // mark this block (special treatment when block order is computed)
   new_sux->set(critical_edge_split_flag);
@@ -683,7 +680,7 @@ void BlockBegin::iterate_preorder(boolArray& mark, BlockClosure* closure) {
     closure->block_do(this);
     BlockEnd* e = end(); // must do this after block_do because block_do may change it!
     { for (int i = number_of_exception_handlers() - 1; i >= 0; i--) exception_handler_at(i)->iterate_preorder(mark, closure); }
-    { for (int i = e->number_of_sux            () - 1; i >= 0; i--) e->sux_at           (i)->iterate_preorder(mark, closure); } // USAGE 5.8, YES BlockBegin
+    { for (int i = e->number_of_sux            () - 1; i >= 0; i--) e->sux_at           (i)->iterate_preorder(mark, closure); }
   }
 }
 
@@ -693,7 +690,7 @@ void BlockBegin::iterate_postorder(boolArray& mark, BlockClosure* closure) {
     mark.at_put(block_id(), true);
     BlockEnd* e = end();
     { for (int i = number_of_exception_handlers() - 1; i >= 0; i--) exception_handler_at(i)->iterate_postorder(mark, closure); }
-    { for (int i = e->number_of_sux            () - 1; i >= 0; i--) e->sux_at           (i)->iterate_postorder(mark, closure); } // USAGE 5.7, YES BlockBegin
+    { for (int i = e->number_of_sux            () - 1; i >= 0; i--) e->sux_at           (i)->iterate_postorder(mark, closure); }
     closure->block_do(this);
   }
 }
@@ -925,7 +922,7 @@ void BlockList::print(bool cfg_only, bool live_only) {
 // Implementation of BlockEnd
 
 void BlockEnd::substitute_sux(BlockBegin* old_sux, BlockBegin* new_sux) {
-  substitute(*_sux, old_sux, new_sux); // USAGE 9
+  substitute(*_sux, old_sux, new_sux);
 }
 
 // Implementation of Phi
