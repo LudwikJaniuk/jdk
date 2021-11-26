@@ -1816,8 +1816,8 @@ BASE(BlockEnd, StateSplit)
   BlockBegin* begin() const                      { return _block; }
 
   // manipulation
-  void remove_sux_at(int i) { _sux->remove_at(i);}
-  int find_sux(BlockBegin* sux) {return _sux->find(sux);}
+  inline void remove_sux_at(int i) { _sux->remove_at(i);}
+  inline int find_sux(BlockBegin* sux) {return _sux->find(sux);}
 
   // successors
   int number_of_sux() const                      { return _sux != NULL ? _sux->length() : 0; }
