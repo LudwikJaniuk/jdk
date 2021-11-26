@@ -1680,7 +1680,7 @@ LEAF(BlockBegin, StateSplit)
   // accessors
   int block_id() const                           { return _block_id; }
   int bci() const                                { return _bci; }
-  BlockList* successors()                        { return &_successors; } // This enables people to easily break consistency // TODO remove
+  BlockList* successors();
   // Luckily, it's literally only used in syncing code, and in a printer.
   BlockList* dominates()                         { return &_dominates; }
   BlockBegin* dominator() const                  { return _dominator; }
@@ -1739,7 +1739,6 @@ LEAF(BlockBegin, StateSplit)
   int find_sux(BlockBegin* sux);
   void clear_sux();
   void add_successor_local(BlockBegin* sux);
-  bool is_successor(BlockBegin* sux) const       { return _successors.contains(sux); }
 
   void add_predecessor(BlockBegin* pred);
   void remove_predecessor(BlockBegin* pred);
@@ -2449,26 +2448,9 @@ class BlockPair: public CompilationResourceObj {
 
 typedef GrowableArray<BlockPair*> BlockPairList;
 
-inline int         BlockBegin::number_of_sux() const            { assert(_end != NULL && _end->number_of_sux() == _successors.length(), "mismatch"); return _end->number_of_sux(); }
-// Usages:
-//  GraphBuilder BlockListBuilder::markloops - used in nullable area of GraphBuilder()
-//  GraphBuilder BlockListBuilder::print - also used in nullable area of GraphBuilder()
-inline BlockBegin* BlockBegin::sux_at(int i) const              { assert(_end != NULL && _end->sux_at(i) == _successors.at(i), "mismatch");          return _end->sux_at(i); }
-// Usages:
-//  GraphBuilder BlockListBuilder::markloops - used in nullable area of GraphBuilder()
-//  GraphBuilder BlockListBuilder::print - also used in nullable area of GraphBuilder()
+inline int         BlockBegin::number_of_sux() const            { assert(_end != NULL, "need end"); return _end->number_of_sux(); }
+inline BlockBegin* BlockBegin::sux_at(int i) const              { assert(_end != NULL , "need end"); return _end->sux_at(i); }
 
-
-// The last footholds of using local successors
-inline int         BlockBegin::number_of_sux_from_local() const { assert(_end == NULL, "should only be used when _end is null");                     return _successors.length(); }
-inline BlockBegin* BlockBegin::sux_at_from_local(int i) const   { assert(_end == NULL, "should only be used when _end is null");                     return _successors.at(i); }
-inline void        BlockBegin::add_successor_local(BlockBegin* sux)   { assert(_end == NULL, "Would create mismatch with successors of BlockEnd");         _successors.append(sux); }
-// Still used... but when it disappears, wont be necessary
-inline void BlockBegin::clear_sux() {_successors.clear();}
-
-// Usages:
-//  GraphBuilder BlockListBuilder::handle_exceptions - used in nullable area of GraphBUilder()
-//  GraphBuilder BlockListBuilder::make_block_at - used in nullable area of GraphBUilder()
 
 
 #undef ASSERT_VALUES
