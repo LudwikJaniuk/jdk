@@ -540,6 +540,7 @@ void BlockBegin::set_end(BlockEnd* end) {
     _end = NULL;
   }
 
+
   // Now reset successors list based on BlockEnd
   // (This is a hint that BlockEnd holds SSOT)
   _successors.clear();
@@ -949,20 +950,9 @@ void BlockList::print(bool cfg_only, bool live_only) {
 
 // Implementation of BlockEnd
 
-// The duality between this and BlockBegin::set_end() is interesting. Both defer to the other.
-// BlockBegin::set_end() actually calls this!
-// And it's the only one. This content code is stupid and should die.
-// 1. split into null/nonnull case
-void BlockEnd::set_sux_from_begin(BlockBegin* begin) { // TODO refactor reduce
-  assert(begin->end() != NULL, "Using successors, need end");
-  _sux = begin->successors();  // USAGE 10
-}
-
-
 void BlockEnd::substitute_sux(BlockBegin* old_sux, BlockBegin* new_sux) {
   substitute(*_sux, old_sux, new_sux); // USAGE 9
 }
-
 
 // Implementation of Phi
 
