@@ -1600,11 +1600,7 @@ LEAF(BlockBegin, StateSplit)
   BlockBegin* _dominator;                        // the dominator of this block
   // SSA specific ends
   BlockEnd*  _end;                               // the last instruction of this block
-  // If we remove _successors, this cant be null... when is it null?
-  // Unless, we would make the accessors treat sux as an empty field...
-  // There is an "add successsor" that explicitly only works when end is null lol
-  // Working theory, it's used in graphbuilder... RESUME HERE
-  BlockList  _exception_handlers;                // the exception handlers potentially invoked by this block    // Are these gues releveant?
+  BlockList  _exception_handlers;                // the exception handlers potentially invoked by this block
   ValueStackStack* _exception_states;            // only for xhandler entries: states of all instructions that have an edge to this xhandler
   int        _exception_handler_pco;             // if this block is the start of an exception handler,
                                                  // this records the PC offset in the assembly code of the
@@ -1655,7 +1651,7 @@ LEAF(BlockBegin, StateSplit)
   , _predecessors(2)
   , _dominates(2)
   , _dominator(NULL)
-  , _end(NULL) // Okay... it's null at startup...
+  , _end(NULL)
   , _exception_handlers(1)
   , _exception_states(NULL)
   , _exception_handler_pco(-1)
@@ -1706,7 +1702,6 @@ LEAF(BlockBegin, StateSplit)
   void set_depth_first_number(int dfn)           { _depth_first_number = dfn; }
   void set_linear_scan_number(int lsn)           { _linear_scan_number = lsn; }
   void set_end(BlockEnd* end);
-
   static void disconnect_edge(BlockBegin* from, BlockBegin* to);
   BlockBegin* insert_block_between(BlockBegin* sux);
   void substitute_sux(BlockBegin* old_sux, BlockBegin* new_sux);
@@ -1800,7 +1795,7 @@ LEAF(BlockBegin, StateSplit)
 
 BASE(BlockEnd, StateSplit)
  private:
-  BlockList*  _sux; // TARGET
+  BlockList*  _sux;
 
  protected:
   BlockList* sux() const                         { return _sux; }
@@ -1810,7 +1805,7 @@ BASE(BlockEnd, StateSplit)
     assert(sux != NULL, "sux must exist");
     for (int i = sux->length() - 1; i >= 0; i--) assert(sux->at(i) != NULL, "sux must exist");
 #endif
-    _sux = sux; // USAGE 2
+    _sux = sux;
   }
 
  public:
@@ -1819,7 +1814,7 @@ BASE(BlockEnd, StateSplit)
   // _sux is set every place this is created... (except the Return case for some reason. And Throw, which seems more likely)
   BlockEnd(ValueType* type, ValueStack* state_before, bool is_safepoint)
   : StateSplit(type, state_before)
-  , _sux(NULL) // USAGE 3
+  , _sux(NULL)
   {
     set_flag(IsSafepointFlag, is_safepoint);
   }
@@ -1835,12 +1830,12 @@ BASE(BlockEnd, StateSplit)
   void clear_sux() {_sux->clear();}
 
   // successors
-  int number_of_sux() const                      { return _sux != NULL ? _sux->length() : 0; } // USAGE 4
-  BlockBegin* sux_at(int i) const                { return _sux->at(i); } // USAGE 5
-  BlockBegin* default_sux() const                { return sux_at(number_of_sux() - 1); } // USAGE 6
-  BlockBegin** addr_sux_at(int i) const          { return _sux->adr_at(i); } // USAGE 7
-  int sux_index(BlockBegin* sux) const           { return _sux->find(sux); } // USAGE 8
-  void substitute_sux(BlockBegin* old_sux, BlockBegin* new_sux); // USAGE 9 (Used 2 times from BlockBegin...)
+  int number_of_sux() const                      { return _sux != NULL ? _sux->length() : 0; }
+  BlockBegin* sux_at(int i) const                { return _sux->at(i); }
+  BlockBegin* default_sux() const                { return sux_at(number_of_sux() - 1); }
+  BlockBegin** addr_sux_at(int i) const          { return _sux->adr_at(i); } // TODO REMOVE?
+  int sux_index(BlockBegin* sux) const           { return _sux->find(sux); } // TODO REMOVE?
+  void substitute_sux(BlockBegin* old_sux, BlockBegin* new_sux);
 };
 
 
@@ -1990,7 +1985,7 @@ LEAF(If, BlockEnd)
   Condition cond() const                         { return _cond; }
   bool unordered_is_true() const                 { return check_flag(UnorderedIsTrueFlag); }
   Value y() const                                { return _y; }
-  BlockBegin* sux_for(bool is_true) const        { return sux_at(is_true ? 0 : 1); } // USAGE 5.24 NO BlockBegin
+  BlockBegin* sux_for(bool is_true) const        { return sux_at(is_true ? 0 : 1); }
   BlockBegin* tsux() const                       { return sux_for(true); }
   BlockBegin* fsux() const                       { return sux_for(false); }
   BlockBegin* usux() const                       { return sux_for(unordered_is_true()); }
@@ -2127,7 +2122,7 @@ LEAF(Base, BlockEnd)
 
   // accessors
   BlockBegin* std_entry() const                  { return default_sux(); }
-  BlockBegin* osr_entry() const                  { return number_of_sux() < 2 ? NULL : sux_at(0); } // USAGE 5.23 NO BlockBegin
+  BlockBegin* osr_entry() const                  { return number_of_sux() < 2 ? NULL : sux_at(0); }
 };
 
 
@@ -2448,8 +2443,6 @@ typedef GrowableArray<BlockPair*> BlockPairList;
 
 inline int         BlockBegin::number_of_sux() const            { assert(_end != NULL, "need end"); return _end->number_of_sux(); }
 inline BlockBegin* BlockBegin::sux_at(int i) const              { assert(_end != NULL , "need end"); return _end->sux_at(i); }
-
-
 
 #undef ASSERT_VALUES
 
