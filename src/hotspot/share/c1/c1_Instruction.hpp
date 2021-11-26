@@ -1595,7 +1595,6 @@ LEAF(BlockBegin, StateSplit)
   ResourceBitMap _stores_to_locals;              // bit is set when a local variable is stored in the block
 
   // SSA specific fields: (factor out later)
-  BlockList   _successors;                       // the successors of this block             // TODO Remove // On each access, is _end set?
   BlockList   _predecessors;                     // the predecessors of this block
   BlockList   _dominates;                        // list of blocks that are dominated by this block
   BlockBegin* _dominator;                        // the dominator of this block
@@ -1653,7 +1652,6 @@ LEAF(BlockBegin, StateSplit)
   , _flags(0)
   , _total_preds(0)
   , _stores_to_locals()
-  , _successors(2)
   , _predecessors(2)
   , _dominates(2)
   , _dominator(NULL)
@@ -1680,8 +1678,6 @@ LEAF(BlockBegin, StateSplit)
   // accessors
   int block_id() const                           { return _block_id; }
   int bci() const                                { return _bci; }
-  BlockList* successors();
-  // Luckily, it's literally only used in syncing code, and in a printer.
   BlockList* dominates()                         { return &_dominates; }
   BlockBegin* dominator() const                  { return _dominator; }
   int loop_depth() const                         { return _loop_depth; }
@@ -1806,8 +1802,8 @@ BASE(BlockEnd, StateSplit)
  private:
   BlockList*  _sux; // TARGET
 
- public:
-  BlockList* sux() const                         { return _sux; } // USAGE 1
+ protected:
+  BlockList* sux() const                         { return _sux; }
 
   void set_sux(BlockList* sux) {
 #ifdef ASSERT
@@ -1816,6 +1812,8 @@ BASE(BlockEnd, StateSplit)
 #endif
     _sux = sux; // USAGE 2
   }
+
+ public:
 
   // creation
   // _sux is set every place this is created... (except the Return case for some reason. And Throw, which seems more likely)
