@@ -525,6 +525,7 @@ Constant::CompareResult Constant::compare(Instruction::Condition cond, Value rig
 // Implementation of BlockBegin
 
 void BlockBegin::set_end(BlockEnd* new_end) {
+  // Assumes that no
   assert(new_end != NULL, "Should not reset block new_end to NULL");
   if (new_end == _end) return;
 
