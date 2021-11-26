@@ -90,7 +90,6 @@ class BlockListBuilder {
   void print();
 #endif
 
-  // Removing successor duplication
   int number_of_successors(BlockBegin* block);
   BlockBegin* successor_at(BlockBegin* block, int i);
   void add_successor(BlockBegin* block, BlockBegin* sux);
@@ -3248,7 +3247,7 @@ GraphBuilder::GraphBuilder(Compilation* compilation, IRScope* scope)
   _initial_state = state_at_entry();
   start_block->merge(_initial_state);
 
-  // End nulls still exist here
+  // There still exist BlockBegins with end() == NULL
 
   // complete graph
   _vmap        = new ValueMap();
@@ -3394,10 +3393,6 @@ GraphBuilder::GraphBuilder(Compilation* compilation, IRScope* scope)
 #ifndef PRODUCT
   if (PrintCompilation && Verbose) tty->print_cr("Created %d Instructions", _instruction_count);
 #endif
-
-  // JANIUK: If we iterate all the blocks in _blocks, some of them have end NULL.
-  // But the ones reachable from start don't, we saw that earlier.
-  // Ah! So a lot of BlockBegins get discarded. The only ones that survive are the ones reachable from start at the end.
 }
 
 
