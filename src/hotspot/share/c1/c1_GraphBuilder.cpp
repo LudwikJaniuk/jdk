@@ -3345,17 +3345,16 @@ GraphBuilder::GraphBuilder(Compilation* compilation, IRScope* scope)
   }
   CHECK_BAILOUT();
 
-  ///////////
-  // JANIUK All ends are non-null here!
-  // This means all blocks reachable from start_block have end non null
+# ifdef ASSERT
+  //All blocks reachable from start_block have _end != NULL
   {
     BlockList processed;
     BlockList to_go;
     to_go.append(start_block);
     while(to_go.length() > 0) {
       BlockBegin* current = to_go.pop();
-      assert(current != NULL, "dont expect null");
-      assert(current->end() != NULL, "an end is NULL... before setup start");
+      assert(current != NULL, "Should not happen.");
+      assert(current->end() != NULL, "All blocks reachable from start_block should have end() != NULL.");
       processed.append(current);
       for(int i = 0; i < current->number_of_sux(); i++) {
         BlockBegin* s = current->sux_at(i);
@@ -3365,7 +3364,7 @@ GraphBuilder::GraphBuilder(Compilation* compilation, IRScope* scope)
       }
     }
   }
-  //////////
+#endif // ASSERT
 
   _start = setup_start_block(osr_bci, start_block, _osr_entry, _initial_state);
 
