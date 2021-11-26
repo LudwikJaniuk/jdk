@@ -920,6 +920,7 @@ void BlockEnd::substitute_sux(BlockBegin* old_sux, BlockBegin* new_sux) {
   substitute(*_sux, old_sux, new_sux);
 }
 
+
 // Implementation of Phi
 
 // Normal phi functions take their operands from the last instruction of the
