@@ -972,7 +972,6 @@ void BlockEnd::set_sux_from_begin(BlockBegin* begin) { // TODO refactor reduce
 }
 
 void BlockEnd::clear_begin() {
-    BlockList* sux = NULL;
     if (this->begin() != NULL) {  // Begin can be null. can BlockBegin.end() be null?
       // copy our sux list
       BlockList* sux = new BlockList(this->begin()->number_of_sux());
@@ -980,8 +979,9 @@ void BlockEnd::clear_begin() {
         sux->append(this->begin()->sux_at(i)); // This is gonna be voodoo if I'm not careful
         // Although... this whole method will just be a setter once I'm done
       }
+      // NB the copy is completely worhless
     }
-    _sux = sux;  // USAGE 10
+    _sux = NULL;  // USAGE 10
 }
 
 
