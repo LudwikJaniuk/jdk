@@ -2432,8 +2432,6 @@ typedef GrowableArray<BlockPair*> BlockPairList;
 inline int         BlockBegin::number_of_sux() const            { assert(_end != NULL, "need end"); return _end->number_of_sux(); }
 inline BlockBegin* BlockBegin::sux_at(int i) const              { assert(_end != NULL , "need end"); return _end->sux_at(i); }
 
-
-
 #undef ASSERT_VALUES
 
 #endif // SHARE_C1_C1_INSTRUCTION_HPP
