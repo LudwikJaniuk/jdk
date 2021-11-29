@@ -524,6 +524,8 @@ Constant::CompareResult Constant::compare(Instruction::Condition cond, Value rig
 
 // Implementation of BlockBegin
 
+
+// This... is used a lot... probably its code is more relied upon
 void BlockBegin::set_end(BlockEnd* end) {
   assert(end != NULL, "should not reset block end to NULL");
   if (end == _end) {
@@ -534,14 +536,17 @@ void BlockBegin::set_end(BlockEnd* end) {
   // Set the new end
   _end = end;
 
-  _successors.clear();
-  // Now reset successors list based on BlockEnd
+  _successors.clear(); // End asserted
+  // Now reset successors list based on BlockEnd  // This is a hint that BlockEnd holds SSOT
+  // Copy successors from end to here
   for (int i = 0; i < end->number_of_sux(); i++) {
-    BlockBegin* sux = end->sux_at(i);
-    _successors.append(sux);
+    BlockBegin* sux = end->sux_at(i); // USAGE 5.9 YES BlockBegin
+    _successors.append(sux); // End asserted
     sux->_predecessors.append(this);
   }
-  _end->set_begin(this);
+
+  // Now copy successors from here to end /facepalm/
+  _end->set_begin(this); // But then we call this... which copies them over again...?
 }
 
 
@@ -553,8 +558,8 @@ void BlockBegin::clear_end() {
     _end->set_begin(NULL);
 
     // disconnect this block from it's current successors
-    for (int i = 0; i < _successors.length(); i++) {
-      _successors.at(i)->remove_predecessor(this);
+    for (int i = 0; i < _successors.length(); i++) { // end is guaranteed
+      _successors.at(i)->remove_predecessor(this); // end is guaranteed
     }
     _end = NULL;
   }
@@ -568,21 +573,24 @@ void BlockBegin::disconnect_edge(BlockBegin* from, BlockBegin* to) {
     tty->print_cr("Disconnected edge B%d -> B%d", from->block_id(), to->block_id());
   }
 #endif
-  for (int s = 0; s < from->number_of_sux();) {
+  // I think end should be asserted here
+  for (int s = 0; s < from->number_of_sux();) { // asserts _end
     BlockBegin* sux = from->sux_at(s);
     if (sux == to) {
       int index = sux->_predecessors.find(from);
       if (index >= 0) {
         sux->_predecessors.remove_at(index);
       }
-      from->_successors.remove_at(s);
+      from->_successors.remove_at(s); // _end is asserted
     } else {
       s++;
     }
   }
 }
 
-
+// Seems to not need to change prev _end._sux, because that _end is being discarded anyways,
+// in the only place this is called
+// TODO refactor into blockmerger where it's used
 void BlockBegin::disconnect_from_graph() {
   // disconnect this block from all other blocks
   for (int p = 0; p < number_of_preds(); p++) {
@@ -625,7 +633,7 @@ BlockBegin* BlockBegin::insert_block_between(BlockBegin* sux) {
   // goto. The bci of the goto can't be the one of the if otherwise
   // the state and bci are inconsistent and a deoptimization triggered
   // by the predicate would lead to incorrect execution/a crash.
-  BlockBegin* new_sux = new BlockBegin(bci);
+  BlockBegin* new_sux = new BlockBegin(bci); // END IS SET
 
   // mark this block (special treatment when block order is computed)
   new_sux->set(critical_edge_split_flag);
@@ -710,7 +718,7 @@ void BlockBegin::iterate_preorder(boolArray& mark, BlockClosure* closure) {
     closure->block_do(this);
     BlockEnd* e = end(); // must do this after block_do because block_do may change it!
     { for (int i = number_of_exception_handlers() - 1; i >= 0; i--) exception_handler_at(i)->iterate_preorder(mark, closure); }
-    { for (int i = e->number_of_sux            () - 1; i >= 0; i--) e->sux_at           (i)->iterate_preorder(mark, closure); }
+    { for (int i = e->number_of_sux            () - 1; i >= 0; i--) e->sux_at           (i)->iterate_preorder(mark, closure); } // USAGE 5.8, YES BlockBegin
   }
 }
 
@@ -720,7 +728,7 @@ void BlockBegin::iterate_postorder(boolArray& mark, BlockClosure* closure) {
     mark.at_put(block_id(), true);
     BlockEnd* e = end();
     { for (int i = number_of_exception_handlers() - 1; i >= 0; i--) exception_handler_at(i)->iterate_postorder(mark, closure); }
-    { for (int i = e->number_of_sux            () - 1; i >= 0; i--) e->sux_at           (i)->iterate_postorder(mark, closure); }
+    { for (int i = e->number_of_sux            () - 1; i >= 0; i--) e->sux_at           (i)->iterate_postorder(mark, closure); } // USAGE 5.7, YES BlockBegin
     closure->block_do(this);
   }
 }
@@ -951,24 +959,28 @@ void BlockList::print(bool cfg_only, bool live_only) {
 
 // Implementation of BlockEnd
 
-void BlockEnd::set_begin(BlockBegin* begin) {
+// The duality between this and BlockBegin::set_end() is interesting. Both defer to the other.
+// BlockBegin::set_end() actually calls this!
+// And it's the only one. This content code is stupid and should die.
+void BlockEnd::set_begin(BlockBegin* begin) { // TODO refactor reduce
   BlockList* sux = NULL;
   if (begin != NULL) {
     assert(begin->end() != NULL, "Using successors, need end");
     sux = begin->successors();
-  } else if (this->begin() != NULL) {
+  } else if (this->begin() != NULL) {  // Begin can be null. can BlockBegin.end() be null?
     // copy our sux list
     BlockList* sux = new BlockList(this->begin()->number_of_sux());
     for (int i = 0; i < this->begin()->number_of_sux(); i++) {
-      sux->append(this->begin()->sux_at(i));
+      sux->append(this->begin()->sux_at(i)); // This is gonna be voodoo if I'm not careful
+                                                  // Although... this whole method will just be a setter once I'm done
     }
   }
-  _sux = sux;
+  _sux = sux;  // USAGE 10
 }
 
 
 void BlockEnd::substitute_sux(BlockBegin* old_sux, BlockBegin* new_sux) {
-  substitute(*_sux, old_sux, new_sux);
+  substitute(*_sux, old_sux, new_sux); // USAGE 9
 }
 
 

@@ -831,7 +831,7 @@ void Canonicalizer::do_TableSwitch(TableSwitch* x) {
     int v = x->tag()->type()->as_IntConstant()->value();
     BlockBegin* sux = x->default_sux();
     if (v >= x->lo_key() && v <= x->hi_key()) {
-      sux = x->sux_at(v - x->lo_key());
+      sux = x->sux_at(v - x->lo_key()); // Usage 5.2 (No BlockBegin)
     }
     set_canonical(new Goto(sux, x->state_before(), is_safepoint(x, sux)));
   }
@@ -844,7 +844,7 @@ void Canonicalizer::do_LookupSwitch(LookupSwitch* x) {
     BlockBegin* sux = x->default_sux();
     for (int i = 0; i < x->length(); i++) {
       if (v == x->key_at(i)) {
-        sux = x->sux_at(i);
+        sux = x->sux_at(i); // USAGE 5.1 (No BlockBegin)
       }
     }
     set_canonical(new Goto(sux, x->state_before(), is_safepoint(x, sux)));
