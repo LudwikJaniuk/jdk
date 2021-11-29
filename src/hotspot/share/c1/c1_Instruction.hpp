@@ -1674,10 +1674,6 @@ LEAF(BlockBegin, StateSplit)
   // accessors
   int block_id() const                           { return _block_id; }
   int bci() const                                { return _bci; }
-<<<<<<< HEAD
-  BlockList* successors();
-=======
->>>>>>> cb262291c77 (remove _successors field and accessor)
   BlockList* dominates()                         { return &_dominates; }
   BlockBegin* dominator() const                  { return _dominator; }
   int loop_depth() const                         { return _loop_depth; }
@@ -1802,7 +1798,6 @@ BASE(BlockEnd, StateSplit)
  private:
   BlockList*  _sux;
 
- public:
   BlockList* sux() const                         { return _sux; }
 
   void set_sux(BlockList* sux) {
@@ -1812,6 +1807,8 @@ BASE(BlockEnd, StateSplit)
 #endif
     _sux = sux;
   }
+
+ public:
 
   // creation
   BlockEnd(ValueType* type, ValueStack* state_before, bool is_safepoint)
