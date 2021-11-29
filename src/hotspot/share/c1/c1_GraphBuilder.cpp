@@ -117,7 +117,7 @@ BlockBegin* BlockListBuilder::local_block_successor_at(BlockBegin* block, int i)
 
 void BlockListBuilder::local_block_add_successor(BlockBegin* block, BlockBegin* sux)
 {
-  block->add_successor(sux);
+  block->add_successor_local(sux);
 }
 
 BlockListBuilder::BlockListBuilder(Compilation* compilation, IRScope* scope, int osr_bci)
