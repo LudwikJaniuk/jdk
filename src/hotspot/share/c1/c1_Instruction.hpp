@@ -1798,7 +1798,6 @@ BASE(BlockEnd, StateSplit)
  private:
   BlockList*  _sux;
 
- public:
   BlockList* sux() const                         { return _sux; }
 
   void set_sux(BlockList* sux) {
@@ -1808,6 +1807,8 @@ BASE(BlockEnd, StateSplit)
 #endif
     _sux = sux;
   }
+
+ public:
 
   // creation
   BlockEnd(ValueType* type, ValueStack* state_before, bool is_safepoint)
