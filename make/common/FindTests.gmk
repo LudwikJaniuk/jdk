@@ -26,6 +26,9 @@
 ifndef _FIND_TESTS_GMK
 _FIND_TESTS_GMK := 1
 
+$(info    Was it defined here 5?)
+$(info    JAVA $(JAVA))
+
 # This makefile can be called directly to just trigger generation of the cache
 # makefile. If so, SPEC and MakeBase.gmk need to be included.
 ifeq ($(FINDTESTS_STAND_ALONE), true)

@@ -60,5 +60,9 @@ else
 endif
 topdir := $(strip $(patsubst %/, %, $(dir $(makefile_path))))
 
+
+$(info    Ludvig2)
+$(info    $(topdir))
+
 # ... and then we can include the real makefile
 include $(topdir)/make/Init.gmk

@@ -112,17 +112,23 @@ OPENJDK_BUILD_CPU_ENDIAN := $(OPENJDK_TARGET_CPU_ENDIAN)
 ################################################################################
 # Java executable definitions
 JAVA_CMD := $(BOOT_JDK)/bin/java
+JAVA2_CMD := /tank/lujaniuk/java/jdk-19.0.1/bin/java
 JAVAC_CMD := $(BOOT_JDK)/bin/javac
 JAR_CMD := $(BOOT_JDK)/bin/jar
 JLINK_CMD := $(JDK_OUTPUTDIR)/bin/jlink
 JMOD_CMD := $(JDK_OUTPUTDIR)/bin/jmod
 
+$(info    Defining JAVA2_CMD $(JAVA2_CMD))
+
 JAVA := $(FIXPATH) $(JAVA_CMD) $(JAVA_FLAGS_BIG) $(JAVA_FLAGS)
+JAVA2 := $(FIXPATH) $(JAVA2_CMD) $(JAVA_FLAGS_BIG) $(JAVA_FLAGS)
 JAVA_SMALL := $(FIXPATH) $(JAVA_CMD) $(JAVA_FLAGS_SMALL) $(JAVA_FLAGS)
 JAVAC := $(FIXPATH) $(JAVAC_CMD)
 JAR := $(FIXPATH) $(JAR_CMD)
 JLINK := $(FIXPATH) $(JLINK_CMD)
 JMOD := $(FIXPATH) $(JMOD_CMD)
+
+$(info    Defining JAVA2 $(JAVA2))
 
 BUILD_JAVA := $(JDK_IMAGE_DIR)/bin/JAVA
 ################################################################################

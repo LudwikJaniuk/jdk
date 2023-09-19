@@ -31,6 +31,9 @@
 # Declare default target
 default:
 
+
+$(info    Ludvig10)
+
 ifeq ($(wildcard $(SPEC)),)
   $(error Main.gmk needs SPEC set to a proper spec.gmk)
 endif

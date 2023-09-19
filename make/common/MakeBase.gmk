@@ -29,6 +29,9 @@
 #
 ################################################################
 
+$(info    Was it defined here 6?)
+$(info    JAVA $(JAVA))
+
 ifndef _MAKEBASE_GMK
 _MAKEBASE_GMK := 1
 

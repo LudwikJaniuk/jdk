@@ -665,6 +665,8 @@ JAVA_FLAGS_SMALL:=@JAVA_FLAGS_SMALL@
 BUILDJDK_JAVA_FLAGS_SMALL:=@BUILDJDK_JAVA_FLAGS_SMALL@
 JAVA_TOOL_FLAGS_SMALL:=@JAVA_TOOL_FLAGS_SMALL@
 
+LUDVIG_JANIUK_VARIABLE:=@LUDVIG_JANIUK_VARIABLE@
+
 # The *_CMD variables are defined separately to be easily overridden in bootcycle-spec.gmk
 # for bootcycle-images build. Make sure to keep them in sync. Do not use the *_CMD
 # versions of the variables directly.

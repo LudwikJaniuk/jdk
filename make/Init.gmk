@@ -33,6 +33,8 @@
 default:
 .PHONY: default
 
+$(info    Ludvit4)
+
 # Inclusion of this pseudo-target will cause make to execute this file
 # serially, regardless of -j.
 .NOTPARALLEL:
@@ -41,13 +43,16 @@ ifeq ($(HAS_SPEC),)
   ##############################################################################
   # This is the default mode. We have not been recursively called with a SPEC.
   ##############################################################################
+  $(info    Ludvit5)
 
   # Include our helper functions.
   include $(topdir)/make/InitSupport.gmk
 
+  $(info    Ludvit6)
   # Here are "global" targets, i.e. targets that can be executed without having
   # a configuration. This will define ALL_GLOBAL_TARGETS.
   include $(topdir)/make/Global.gmk
+  $(info    Ludvit7)
 
   # Targets provided by Init.gmk.
   ALL_INIT_TARGETS := print-modules print-targets print-configuration \
@@ -57,6 +62,7 @@ ifeq ($(HAS_SPEC),)
   # or "default" if unspecified.
   CALLED_TARGETS := $(if $(MAKECMDGOALS), $(MAKECMDGOALS), default)
 
+  $(info    Ludvit8)
   # Extract non-global targets that require a spec file.
   CALLED_SPEC_TARGETS := $(filter-out $(ALL_GLOBAL_TARGETS), $(CALLED_TARGETS))
 
@@ -108,6 +114,7 @@ ifeq ($(HAS_SPEC),)
     # user and we need to call ourself back with a proper SPEC.
     # We have at least one non-global target, so we need to find a spec file.
     ############################################################################
+    $(info    Ludvit9)
 
     # Basic checks on environment and command line.
     $(eval $(call CheckControlVariables))

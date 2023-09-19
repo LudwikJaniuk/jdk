@@ -25,9 +25,17 @@
 
 default: all
 
+$(info    Was it defined here?)
+$(info    JAVA $(JAVA))
+
 include $(SPEC)
 include MakeBase.gmk
+$(info    Was it defined here 2?)
+$(info    JAVA $(JAVA))
 include FindTests.gmk
+
+$(info    Was it defined here 3?)
+$(info    JAVA $(JAVA))
 
 # We will always run multiple tests serially
 .NOTPARALLEL:
@@ -35,6 +43,8 @@ include FindTests.gmk
 ################################################################################
 # Parse global control variables
 ################################################################################
+
+$(info    Ludvig11)
 
 ifneq ($(TEST_VM_OPTS), )
   ifneq ($(TEST_OPTS), )
@@ -865,8 +875,13 @@ define SetupRunJtregTestBody
   clean-workdir-$1:
 	$$(RM) -r $$($1_TEST_SUPPORT_DIR)
 
+  $(info    Ludvig12)
+  $(info    JAVA $(JAVA))
+  $(info    JAVA2 $(JAVA2))
+  $(info    BOOT_JDK $(BOOT_JDK))
+  $(info    Ludvig13)
   $1_COMMAND_LINE := \
-      $$(JAVA) $$($1_JTREG_LAUNCHER_OPTIONS) \
+      $$(JAVA2) $$($1_JTREG_LAUNCHER_OPTIONS) \
           -Dprogram=jtreg -jar $$(JT_HOME)/lib/jtreg.jar \
           $$($1_JTREG_BASIC_OPTIONS) \
           -testjdk:$$(JDK_UNDER_TEST) \
