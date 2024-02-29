@@ -89,13 +89,19 @@ public class VMDebugTest {
 
         // Test VM.debug findclass:
         output = executor.execute("VM.debug findclass");
-        output.shouldContain("missing argument");
+        output.shouldContain("missing argument CLASS_PATTERN");
+        output = executor.execute("VM.debug findclass java/lang/String");
+        output.shouldContain("missing argument FLAGS");
         output = executor.execute("VM.debug findclass java/lang/String 3");
         output.shouldContain("class java/lang/String");
 
         // Test VM.debug findmethod:
         output = executor.execute("VM.debug findmethod");
-        output.shouldContain("missing argument");
+        output.shouldContain("missing argument CLASS_PATTERN");
+        output = executor.execute("VM.debug findmethod java/lang/String");
+        output.shouldContain("missing argument METHOD_PATTERN");
+        output = executor.execute("VM.debug findmethod java/lang/String contains");
+        output.shouldContain("missing argument FLAGS");
         output = executor.execute("VM.debug findmethod java/lang/String contains 3");
         output.shouldContain("class java/lang/String");
 
